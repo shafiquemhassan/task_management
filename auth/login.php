@@ -8,7 +8,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    // Basic validation
     if (empty($username) || empty($password)) {
         $error_msg = "Please enter both username and password.";
     } else {
@@ -22,12 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $user = $result->fetch_assoc();
 
             if (password_verify($password, $user['password'])) {
-                // Set session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role'] = $user['role'];
 
-                // Redirect by role
                 if ($user['role'] == 'admin') {
                     header("Location: ../admin/dashboard.php");
                 } else {
@@ -47,95 +44,187 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Task Management System</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Task Management System</title>
+  <link rel="stylesheet" href="../assets/css/bootstrap.css">
 
-    <link rel="stylesheet" href="../assets/css/bootstrap.css">
+  <style>
+    body {
+      height: 100vh;
+      background: linear-gradient(135deg, #0d6efd 40%, #f8f9fa 40%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
 
-    <style>
-        body {
-            height: 100vh;
-            background-color: #f8f9fa;
-        }
+    .login-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      max-width: 900px;
+      width: 90%;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
 
-        .container-fluid {
-            height: 100%;
-        }
+    .info-section {
+      flex: 1;
+      background: #0d6efd;
+      color: #fff;
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
-        .left-side {
-            background-color: #0d6efd;
-            color: #fff;
-        }
+    .info-section h1 {
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
 
-        .left-side h1 {
-            font-size: 2rem;
-            font-weight: 600;
-        }
+    .info-section p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
 
-        .login-card {
-            max-width: 400px;
-            width: 100%;
-        }
+    .form-section {
+      flex: 1;
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
-        .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-        }
-    </style>
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    .login-card h3 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #0d6efd;
+      font-weight: 600;
+    }
+
+    .form-label {
+      font-weight: 600;
+    }
+
+    .form-control {
+      border-radius: 10px;
+      padding: 0.75rem;
+    }
+
+    .form-control:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .btn-primary {
+      background-color: #0d6efd;
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background-color: #0b5ed7;
+    }
+
+    .alert {
+      font-size: 0.9rem;
+      border-radius: 10px;
+    }
+
+    .link {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .link a {
+      color: #0d6efd;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .info-section {
+        display: none;
+      }
+      .form-section {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="container-fluid d-flex flex-column flex-md-row align-items-center justify-content-center">
-    <!-- Left side - Title -->
-    <div class="left-side d-flex flex-column justify-content-center align-items-center p-5 flex-fill text-center text-md-start">
-        <h1>Task Management System</h1>
-        <p class="mt-2">Stay organized and manage your tasks efficiently.</p>
+  <div class="login-wrapper">
+    <!-- Left Info Section -->
+    <div class="info-section">
+      <h1>Welcome to Task Management System</h1>
+      <p>Plan, organize, and track your work efficiently. Log in to access your dashboard and manage your daily tasks effortlessly.</p>
     </div>
 
-    <!-- Right side - Login Form -->
-    <div class="d-flex justify-content-center align-items-center flex-fill p-5">
-        <div class="login-card bg-white p-4 rounded shadow-sm">
-            <h3 class="text-center mb-4">Login</h3>
+    <!-- Right Login Section -->
+    <div class="form-section">
+      <div class="login-card">
+        <h3>Sign In</h3>
 
-            <!-- Bootstrap Alert -->
-            <?php if (!empty($error_msg)): ?>
-                <div class="alert alert-danger text-center py-2">
-                    <?php echo htmlspecialchars($error_msg); ?>
-                </div>
-            <?php endif; ?>
+        <?php if (!empty($error_msg)): ?>
+          <div class="alert alert-danger text-center py-2" role="alert">
+            <?php echo htmlspecialchars($error_msg); ?>
+          </div>
+        <?php endif; ?>
 
-            <form method="POST">
-                <div class="mb-3">
-                    <label for="username" class="form-label fw-semibold">Username</label>
-                    <input type="text" 
-                           class="form-control" 
-                           id="username" 
-                           name="username" 
-                           placeholder="Enter username" 
-                           required
-                           value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
-                </div>
+        <form method="POST" novalidate>
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="username" 
+              name="username" 
+              placeholder="Enter username"
+              value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>"
+              required 
+              aria-required="true"
+            >
+          </div>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label fw-semibold">Password</label>
-                    <input type="password" 
-                           class="form-control" 
-                           id="password" 
-                           name="password" 
-                           placeholder="Enter password" 
-                           required>
-                </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input 
+              type="password" 
+              class="form-control" 
+              id="password" 
+              name="password" 
+              placeholder="Enter password" 
+              required 
+              aria-required="true"
+            >
+          </div>
 
-                <button type="submit" class="btn btn-primary w-100 mt-3">Login</button>
+          <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
 
-                <div class="text-center mt-3">
-                    <a href="register.php" class="text-primary">For Registration</a>
-                </div>
-            </form>
-        </div>
+          <div class="link">
+            <a href="register.php">Don’t have an account? Register</a>
+          </div>
+        </form>
+      </div>
     </div>
-</div>
+  </div>
 
-<script src="../assets/js/bootstrap.js"></script>
+  <script src="../assets/js/bootstrap.js"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";       
 $pass = "";           
-$db   = "todo_system";
+$db   = "task_mangement";
 
 $conn = new mysqli($host, $user, $pass, $db);
 
